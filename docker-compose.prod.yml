@@ -1,0 +1,52 @@
+version: '3.6'
+
+volumes:
+  database:
+    driver: local
+
+services:
+  web:
+    container_name: web
+    image: ${CONTAINER_IMAGE}
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8080:80"
+    links:
+      - database
+
+  database:
+    image: mysql:5.7.24
+    volumes:
+      - ./database:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_PORT=${DB_PORT_HOST}
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 4301:8080
+    links:
+      - database
+
+  phpmyadmin-mariadb:
+    image: phpmyadmin/phpmyadmin:4.8.5
+    restart: always
+    environment:
+      - PMA_HOST=database
+      - PMA_PORT=${DB_PORT_HOST}
+      - PMA_USER=${DB_USER}
+      - PMA_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "3001:80"
+
+
+
+
+
+
